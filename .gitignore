@@ -39,3 +39,8 @@ yarn.lock
 
 # Avoid accidental XD upload if you convert the design file
 *.xd
+
+# Avoid upload of codesandbox config file
+.codesandbox/
+.devcontainer/
+.github/
