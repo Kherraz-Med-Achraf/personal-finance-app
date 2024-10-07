@@ -13,11 +13,11 @@ const routes = [
         name: "Home",
         component: Home,
       },
-      // {
-      //   path: "profile",
-      //   name: "Profile",
-      //   component: Profile,
-      // },
+      {
+        path: "transactions",
+        name: "Transactions",
+        component: Home,
+      },
       // {
       //   path: "settings",
       //   name: "Settings",
