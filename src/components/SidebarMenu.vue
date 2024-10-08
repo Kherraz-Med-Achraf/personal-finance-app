@@ -1,30 +1,34 @@
 <template>
   <div class="sidebar-menu">
     <div class="logo">
-      <img v-if="sidebarMenuOpen" :src="LogoLarge" alt="logo" />
-      <img v-else :src="logoSmall" alt="logo" />
+      <transition name="slide-fade" mode="out-in">
+        <img v-if="sidebarMenuOpen" :src="LogoLarge" alt="logo" />
+        <img v-else :src="logoSmall" alt="logo" />
+      </transition>
     </div>
-    <ul>
-      <li class="">
+    <ul :class="{ close: !sidebarMenuOpen }">
+      <li>
         <router-link to="/" exact-active-class="active"
-          ><img :src="OverviewIcon" alt="Overview Icon" /><span
-            v-if="sidebarMenuOpen"
-            >Overview</span
-          ></router-link
-        >
+          ><img :src="OverviewIcon" alt="Overview Icon" />
+          <transition name="slide-fade" mode="out-in">
+            <span v-if="sidebarMenuOpen">Overview</span>
+          </transition>
+        </router-link>
       </li>
       <li>
         <router-link to="/transactions" active-class="active"
-          ><img :src="TransactionsIcon" alt="Transactions Icon" /><span
-            v-if="sidebarMenuOpen"
-            >Transactions</span
-          ></router-link
-        >
+          ><img :src="TransactionsIcon" alt="Transactions Icon" />
+          <transition name="slide-fade" mode="out-in">
+            <span v-if="sidebarMenuOpen">Transactions</span>
+          </transition>
+        </router-link>
       </li>
     </ul>
-    <button>
+    <button @click="toggleSidebarMenu">
       <img :src="MinimiseIcon" alt="Minimize Menu Icon" />
-      <span v-if="sidebarMenuOpen">Minimize Menu</span>
+      <transition name="slide-fade" mode="out-in">
+        <span v-if="sidebarMenuOpen">Minimize Menu</span>
+      </transition>
     </button>
   </div>
 </template>
@@ -44,6 +48,19 @@ let sidebarMenuOpen = ref(true);
 //   // Anime l'élément quand le composant est monté
 //   animate(".sidebar-menu h1", { transform: ["scale(0.5)", "scale(1)"] }, { duration: 1 });
 // });
+
+const sideBarAnimation = () => {
+  if (sidebarMenuOpen.value) {
+    animate(".sidebar-menu", { width: "300px" }, { duration: 0.5 });
+  } else {
+    animate(".sidebar-menu", { width: "88px" }, { duration: 0.5 });
+  }
+};
+
+const toggleSidebarMenu = () => {
+  sidebarMenuOpen.value = !sidebarMenuOpen.value;
+  sideBarAnimation();
+};
 </script>
 
 <style lang="scss" scoped>
@@ -79,7 +96,7 @@ let sidebarMenuOpen = ref(true);
     padding-right: $spacing-300;
     li {
       height: 58px;
-      width: 100%;  
+      width: 100%;
       cursor: pointer;
       a {
         display: flex;
@@ -107,8 +124,8 @@ let sidebarMenuOpen = ref(true);
               saturate(2896%) hue-rotate(128deg) brightness(102%) contrast(91%);
           }
           span {
-          color: $grey-900;
-        }
+            color: $grey-900;
+          }
         }
       }
       &:hover {
@@ -123,6 +140,9 @@ let sidebarMenuOpen = ref(true);
         }
       }
     }
+    &.close {
+      padding-right: 4px;
+    }
   }
   button {
     height: 58px;
@@ -133,6 +153,7 @@ let sidebarMenuOpen = ref(true);
     gap: $spacing-200;
     background-color: transparent;
     border: none;
+    padding: 0 $spacing-400;
     img {
       height: 24px;
       width: auto;
@@ -142,5 +163,23 @@ let sidebarMenuOpen = ref(true);
       color: $grey-300;
     }
   }
+}
+
+// Animations pour les <span>
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-50px); /* L'élément glisse depuis la droite */
+}
+
+.slide-fade-leave-from,
+.slide-fade-enter-to {
+  opacity: 1;
+  transform: translateX(0); /* Position d'origine */
 }
 </style>
