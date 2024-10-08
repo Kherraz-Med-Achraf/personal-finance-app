@@ -1,16 +1,16 @@
 <template>
   <div class="sidebar-menu">
     <div class="logo">
-      <transition name="slide-fade" mode="out-in">
+      <transition name="fade" mode="out-in">
         <img v-if="sidebarMenuOpen" :src="LogoLarge" alt="logo" />
-        <img v-else :src="logoSmall" alt="logo" />
+        <img v-else :src="logoSmall" alt="logo" class="mini" />
       </transition>
     </div>
     <ul :class="{ close: !sidebarMenuOpen }">
       <li>
         <router-link to="/" exact-active-class="active"
           ><img :src="OverviewIcon" alt="Overview Icon" />
-          <transition name="slide-fade" mode="out-in">
+          <transition name="fade" mode="out-in">
             <span v-if="sidebarMenuOpen">Overview</span>
           </transition>
         </router-link>
@@ -18,15 +18,15 @@
       <li>
         <router-link to="/transactions" active-class="active"
           ><img :src="TransactionsIcon" alt="Transactions Icon" />
-          <transition name="slide-fade" mode="out-in">
+          <transition name="fade" mode="out-in">
             <span v-if="sidebarMenuOpen">Transactions</span>
           </transition>
         </router-link>
       </li>
     </ul>
     <button @click="toggleSidebarMenu">
-      <img :src="MinimiseIcon" alt="Minimize Menu Icon" />
-      <transition name="slide-fade" mode="out-in">
+      <div id="Minimize-btn" v-html="MinimiseIcon" class="svg-icon"></div>
+      <transition name="fade" mode="out-in">
         <span v-if="sidebarMenuOpen">Minimize Menu</span>
       </transition>
     </button>
@@ -40,7 +40,7 @@ import LogoLarge from "@/assets/images/logo-large.svg";
 import logoSmall from "@/assets/images/logo-small.svg";
 import OverviewIcon from "@/assets/images/icon-nav-overview.svg";
 import TransactionsIcon from "@/assets/images/icon-nav-transactions.svg";
-import MinimiseIcon from "@/assets/images/icon-minimize-menu.svg";
+import MinimiseIcon from "@/assets/images/icon-minimize-menu.svg?raw";
 
 let sidebarMenuOpen = ref(true);
 
@@ -52,8 +52,10 @@ let sidebarMenuOpen = ref(true);
 const sideBarAnimation = () => {
   if (sidebarMenuOpen.value) {
     animate(".sidebar-menu", { width: "300px" }, { duration: 0.5 });
+    animate("#Minimize-btn", { rotate: ["180deg", "0deg"] }, { duration: 0.5 });
   } else {
     animate(".sidebar-menu", { width: "88px" }, { duration: 0.5 });
+    animate("#Minimize-btn", { rotate: ["0deg", "180deg"] }, { duration: 0.5 });
   }
 };
 
@@ -75,13 +77,17 @@ const toggleSidebarMenu = () => {
   align-items: flex-start;
   .logo {
     height: 101.76px;
+    width: 100%;
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    padding: 0 $spacing-400;
+    padding: 0 36px;
     img {
       height: 21.76px;
       width: auto;
+      &.mini {
+        height: 21.44px;
+      }
     }
   }
   ul {
@@ -114,11 +120,12 @@ const toggleSidebarMenu = () => {
         span {
           @include text-preset-3;
           color: $grey-300;
+          transition: all 0.3s ease;
         }
         &.active {
           background-color: $grey-100;
           border-radius: 0 $spacing-150 $spacing-150 0;
-          border-left: 4px solid $green;
+          box-shadow: inset 4px 0 0 0 $green;
           img {
             filter: brightness(0) saturate(100%) invert(39%) sepia(8%)
               saturate(2896%) hue-rotate(128deg) brightness(102%) contrast(91%);
@@ -141,7 +148,7 @@ const toggleSidebarMenu = () => {
       }
     }
     &.close {
-      padding-right: 4px;
+      padding-right: $spacing-100;
     }
   }
   button {
@@ -154,32 +161,46 @@ const toggleSidebarMenu = () => {
     background-color: transparent;
     border: none;
     padding: 0 $spacing-400;
-    img {
+    cursor: pointer;
+    .svg-icon{
       height: 24px;
       width: auto;
+      svg {
+        fill: red;
+      }
     }
     span {
       @include text-preset-3;
       color: $grey-300;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+    }
+    &:hover {
+      span {
+        color: $grey-100;
+      }
+      .svg-icon{
+        fill: $grey-100;
+      }
     }
   }
 }
 
 // Animations pour les <span>
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
 }
 
-.slide-fade-enter-from,
-.slide-fade-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
-  transform: translateX(-50px); /* L'élément glisse depuis la droite */
+  // transform: translateX(-50px); /* L'élément glisse depuis la droite */
 }
 
-.slide-fade-leave-from,
-.slide-fade-enter-to {
+.fade-leave-from,
+.fade-enter-to {
   opacity: 1;
-  transform: translateX(0); /* Position d'origine */
+  // transform: translateX(0); /* Position d'origine */
 }
 </style>
