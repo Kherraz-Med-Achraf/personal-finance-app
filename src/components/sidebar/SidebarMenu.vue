@@ -11,26 +11,31 @@
         to="/"
         title="Overview"
         :sidebarMenuOpen="sidebarMenuOpen"
+        :responsiveMode="responsiveMode"
       />
       <SidebarMenuItem
         to="/transactions"
         title="Transactions"
         :sidebarMenuOpen="sidebarMenuOpen"
+        :responsiveMode="responsiveMode"
       />
       <SidebarMenuItem
         to="/budgets"
         title="Budgets"
         :sidebarMenuOpen="sidebarMenuOpen"
+        :responsiveMode="responsiveMode"
       />
       <SidebarMenuItem
         to="/pots"
         title="Pots"
         :sidebarMenuOpen="sidebarMenuOpen"
+        :responsiveMode="responsiveMode"
       />
       <SidebarMenuItem
         to="/recurring-bills"
         title="Recurring Bills"
         :sidebarMenuOpen="sidebarMenuOpen"
+        :responsiveMode="responsiveMode"
       />
     </ul>
     <button @click="toggleSidebarMenu">
@@ -51,40 +56,44 @@ import logoSmall from "@/assets/images/logo-small.svg";
 import MinimiseIcon from "@/assets/images/icon-minimize-menu.svg";
 
 let sidebarMenuOpen = ref(true);
-
-// onMounted(() => {
-//   // Anime l'élément quand le composant est monté
-//   animate(".sidebar-menu h1", { transform: ["scale(0.5)", "scale(1)"] }, { duration: 1 });
-// });
+let responsiveMode = ref(false);
+const emit = defineEmits(["toggle-sidebar"]);
 
 const sideBarAnimation = () => {
-  if (window.innerWidth > 768) {
-    if (sidebarMenuOpen.value) {
-      animate(".sidebar-menu", { width: "300px" }, { duration: 0.5 });
-      animate(
-        "#Minimize-btn",
-        { rotate: ["180deg", "0deg"] },
-        { duration: 0.5 }
-      );
-    } else {
-      animate(".sidebar-menu", { width: "88px" }, { duration: 0.5 });
-      animate(
-        "#Minimize-btn",
-        { rotate: ["0deg", "180deg"] },
-        { duration: 0.5 }
-      );
-    }
+  if (sidebarMenuOpen.value) {
+    animate(".sidebar-menu", { width: "300px" }, { duration: 0.5 });
+    animate("#Minimize-btn", { rotate: ["180deg", "0deg"] }, { duration: 0.5 });
+  } else {
+    animate(".sidebar-menu", { width: "88px" }, { duration: 0.5 });
+    animate("#Minimize-btn", { rotate: ["0deg", "180deg"] }, { duration: 0.5 });
   }
 };
 
 const toggleSidebarMenu = () => {
   sidebarMenuOpen.value = !sidebarMenuOpen.value;
+  emit("sidebarMenuOpen", sidebarMenuOpen.value);
   sideBarAnimation();
 };
+
+const handleResize = () => {
+  if (window.innerWidth <= 768 && !sidebarMenuOpen.value) {
+    sidebarMenuOpen.value = true;
+    sideBarAnimation();
+  } 
+};
+
+onMounted(() => {
+  window.addEventListener("resize", handleResize);
+  handleResize();
+});
 </script>
 
 <style lang="scss" scoped>
 .sidebar-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
   width: 300px;
   background-color: $grey-900;
   border-radius: 0 $spacing-200 $spacing-200 0;
@@ -162,7 +171,7 @@ const toggleSidebarMenu = () => {
     width: 100% !important;
     border-radius: $spacing-100 $spacing-100 0 0;
     height: 74px;
-    position: fixed;
+    top: unset;
     bottom: 0;
     flex-direction: row;
     align-items: center;
@@ -187,7 +196,6 @@ const toggleSidebarMenu = () => {
   .sidebar-menu {
     ul {
       padding: $spacing-100 $spacing-200 0 $spacing-200;
-
     }
   }
 }

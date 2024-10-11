@@ -15,6 +15,7 @@ const props = defineProps({
   to: String,
   title: String,
   sidebarMenuOpen: Boolean,
+  responsiveMode: Boolean,
 });
 
 import OverviewIcon from "@/assets/images/icon-nav-overview.svg";
@@ -60,6 +61,7 @@ li {
       @include text-preset-3;
       color: $grey-300;
       transition: all 0.3s ease;
+      white-space: nowrap;
     }
     &.active {
       background-color: $grey-100;
