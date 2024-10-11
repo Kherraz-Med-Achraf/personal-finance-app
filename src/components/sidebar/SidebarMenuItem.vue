@@ -17,7 +17,6 @@ const props = defineProps({
   sidebarMenuOpen: Boolean,
 });
 
-
 import OverviewIcon from "@/assets/images/icon-nav-overview.svg";
 import TransactionsIcon from "@/assets/images/icon-nav-transactions.svg";
 
@@ -27,7 +26,7 @@ const getIconForTitle = (title) => {
     Overview: OverviewIcon,
     Transactions: TransactionsIcon,
   };
-  return iconMap[title] || null; 
+  return iconMap[title] || null;
 };
 </script>
 
@@ -75,6 +74,24 @@ li {
       }
       svg {
         fill: $grey-100;
+      }
+    }
+  }
+}
+@media (max-width: 768px) {
+  li {
+    width: 104px;
+    height: 66px;
+    a {
+      flex-direction: column;
+      justify-content: center;
+      gap: $spacing-50;
+      span {
+        @include text-preset-5;
+      }
+      &.active {
+        border-radius: $spacing-100 $spacing-100 0 0;
+        box-shadow: inset 0 -4px 0 0 $green;
       }
     }
   }

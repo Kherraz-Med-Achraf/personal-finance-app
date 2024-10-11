@@ -43,12 +43,22 @@ let sidebarMenuOpen = ref(true);
 // });
 
 const sideBarAnimation = () => {
-  if (sidebarMenuOpen.value) {
-    animate(".sidebar-menu", { width: "300px" }, { duration: 0.5 });
-    animate("#Minimize-btn", { rotate: ["180deg", "0deg"] }, { duration: 0.5 });
-  } else {
-    animate(".sidebar-menu", { width: "88px" }, { duration: 0.5 });
-    animate("#Minimize-btn", { rotate: ["0deg", "180deg"] }, { duration: 0.5 });
+  if (window.innerWidth > 768) {
+    if (sidebarMenuOpen.value) {
+      animate(".sidebar-menu", { width: "300px" }, { duration: 0.5 });
+      animate(
+        "#Minimize-btn",
+        { rotate: ["180deg", "0deg"] },
+        { duration: 0.5 }
+      );
+    } else {
+      animate(".sidebar-menu", { width: "88px" }, { duration: 0.5 });
+      animate(
+        "#Minimize-btn",
+        { rotate: ["0deg", "180deg"] },
+        { duration: 0.5 }
+      );
+    }
   }
 };
 
@@ -129,6 +139,32 @@ const toggleSidebarMenu = () => {
       .svg-icon {
         fill: $grey-100;
       }
+    }
+  }
+}
+@media (max-width: 768px) {
+  .sidebar-menu {
+    width: 100% !important;
+    border-radius: $spacing-100 $spacing-100 0 0;
+    height: 74px;
+    position: fixed;
+    bottom: 0;
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+    .logo {
+      display: none;
+    }
+    ul {
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      padding: $spacing-100 $spacing-500 0 $spacing-500;
+      gap: unset;
+      height: 100%;
+    }
+    button {
+      display: none;
     }
   }
 }
