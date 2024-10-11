@@ -2,14 +2,14 @@
   <div class="sidebar-menu">
     <div class="logo">
       <transition name="fade" mode="out-in">
-        <img v-if="sidebarMenuOpen" :src="LogoLarge" alt="logo" />
-        <img v-else :src="logoSmall" alt="logo" class="mini" />
+        <logo-large v-if="sidebarMenuOpen" />
+        <logoSmall v-else class="mini" />
       </transition>
     </div>
     <ul :class="{ close: !sidebarMenuOpen }">
       <li>
         <router-link to="/" exact-active-class="active"
-          ><img :src="OverviewIcon" alt="Overview Icon" />
+          ><OverviewIcon />
           <transition name="fade" mode="out-in">
             <span v-if="sidebarMenuOpen">Overview</span>
           </transition>
@@ -17,7 +17,7 @@
       </li>
       <li>
         <router-link to="/transactions" active-class="active"
-          ><img :src="TransactionsIcon" alt="Transactions Icon" />
+          ><TransactionsIcon />
           <transition name="fade" mode="out-in">
             <span v-if="sidebarMenuOpen">Transactions</span>
           </transition>
@@ -25,7 +25,7 @@
       </li>
     </ul>
     <button @click="toggleSidebarMenu">
-      <div id="Minimize-btn" v-html="MinimiseIcon" class="svg-icon"></div>
+      <MinimiseIcon id="Minimize-btn" class="svg-icon" />
       <transition name="fade" mode="out-in">
         <span v-if="sidebarMenuOpen">Minimize Menu</span>
       </transition>
@@ -40,7 +40,7 @@ import LogoLarge from "@/assets/images/logo-large.svg";
 import logoSmall from "@/assets/images/logo-small.svg";
 import OverviewIcon from "@/assets/images/icon-nav-overview.svg";
 import TransactionsIcon from "@/assets/images/icon-nav-transactions.svg";
-import MinimiseIcon from "@/assets/images/icon-minimize-menu.svg?raw";
+import MinimiseIcon from "@/assets/images/icon-minimize-menu.svg";
 
 let sidebarMenuOpen = ref(true);
 
@@ -82,9 +82,10 @@ const toggleSidebarMenu = () => {
     justify-content: flex-start;
     align-items: center;
     padding: 0 36px;
-    img {
+    svg {
       height: 21.76px;
       width: auto;
+      fill: $white;
       &.mini {
         height: 21.44px;
       }
@@ -100,6 +101,7 @@ const toggleSidebarMenu = () => {
     padding: $spacing-300 0;
     width: 100%;
     padding-right: $spacing-300;
+    transition: padding-right 0.3s ease;
     li {
       height: 58px;
       width: 100%;
@@ -113,9 +115,10 @@ const toggleSidebarMenu = () => {
         height: 100%;
         width: 100%;
         padding: 0 $spacing-400;
-        img {
+        svg{
           height: 24px;
-          width: auto;
+          min-width: 24px;
+          fill: $grey-300;
         }
         span {
           @include text-preset-3;
@@ -126,9 +129,8 @@ const toggleSidebarMenu = () => {
           background-color: $grey-100;
           border-radius: 0 $spacing-150 $spacing-150 0;
           box-shadow: inset 4px 0 0 0 $green;
-          img {
-            filter: brightness(0) saturate(100%) invert(39%) sepia(8%)
-              saturate(2896%) hue-rotate(128deg) brightness(102%) contrast(91%);
+          svg {
+            fill: $green;
           }
           span {
             color: $grey-900;
@@ -140,9 +142,8 @@ const toggleSidebarMenu = () => {
           span {
             color: $grey-100;
           }
-          img {
-            filter: brightness(0) saturate(100%) invert(94%) sepia(53%)
-              saturate(153%) hue-rotate(16deg) brightness(112%) contrast(93%);
+          svg {
+            fill: $grey-100;
           }
         }
       }
@@ -162,12 +163,11 @@ const toggleSidebarMenu = () => {
     border: none;
     padding: 0 $spacing-400;
     cursor: pointer;
-    .svg-icon{
+    .svg-icon {
       height: 24px;
       width: auto;
-      svg {
-        fill: red;
-      }
+      fill: $grey-300;
+      transition: fill 0.3s ease;
     }
     span {
       @include text-preset-3;
@@ -179,7 +179,7 @@ const toggleSidebarMenu = () => {
       span {
         color: $grey-100;
       }
-      .svg-icon{
+      .svg-icon {
         fill: $grey-100;
       }
     }
