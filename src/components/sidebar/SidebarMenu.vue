@@ -17,6 +17,21 @@
         title="Transactions"
         :sidebarMenuOpen="sidebarMenuOpen"
       />
+      <SidebarMenuItem
+        to="/budgets"
+        title="Budgets"
+        :sidebarMenuOpen="sidebarMenuOpen"
+      />
+      <SidebarMenuItem
+        to="/pots"
+        title="Pots"
+        :sidebarMenuOpen="sidebarMenuOpen"
+      />
+      <SidebarMenuItem
+        to="/recurring-bills"
+        title="Recurring Bills"
+        :sidebarMenuOpen="sidebarMenuOpen"
+      />
     </ul>
     <button @click="toggleSidebarMenu">
       <MinimiseIcon id="Minimize-btn" class="svg-icon" />
@@ -158,13 +173,21 @@ const toggleSidebarMenu = () => {
     ul {
       flex-direction: row;
       align-items: center;
-      justify-content: flex-start;
+      justify-content: space-between;
       padding: $spacing-100 $spacing-500 0 $spacing-500;
       gap: unset;
       height: 100%;
     }
     button {
       display: none;
+    }
+  }
+}
+@media (max-width: 507px) {
+  .sidebar-menu {
+    ul {
+      padding: $spacing-100 $spacing-200 0 $spacing-200;
+
     }
   }
 }

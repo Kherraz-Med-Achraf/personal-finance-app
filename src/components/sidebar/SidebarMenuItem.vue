@@ -19,12 +19,18 @@ const props = defineProps({
 
 import OverviewIcon from "@/assets/images/icon-nav-overview.svg";
 import TransactionsIcon from "@/assets/images/icon-nav-transactions.svg";
+import BudgetsIcon from "@/assets/images/icon-nav-budgets.svg";
+import PotsIcon from "@/assets/images/icon-nav-pots.svg";
+import RecurringBillsIcon from "@/assets/images/icon-nav-recurring-bills.svg";
 
 // Fonction qui retourne l'icône en fonction du titre
 const getIconForTitle = (title) => {
   const iconMap = {
     Overview: OverviewIcon,
     Transactions: TransactionsIcon,
+    Budgets: BudgetsIcon,
+    Pots: PotsIcon,
+    "Recurring Bills": RecurringBillsIcon,
   };
   return iconMap[title] || null;
 };
@@ -86,12 +92,22 @@ li {
       flex-direction: column;
       justify-content: center;
       gap: $spacing-50;
+      padding: 0;
       span {
-        @include text-preset-5;
+        @include text-preset-5-bold;
       }
       &.active {
         border-radius: $spacing-100 $spacing-100 0 0;
         box-shadow: inset 0 -4px 0 0 $green;
+      }
+    }
+  }
+}
+@media (max-width: 507px) {
+  li {
+    a {
+      span {
+        display: none;
       }
     }
   }
