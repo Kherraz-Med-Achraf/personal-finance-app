@@ -101,3 +101,22 @@ $spacing-200: 16px;
 $spacing-150: 12px;
 $spacing-100: 8px;
 $spacing-50: 4px;
+
+
+// Animations pour les <span>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  // transform: translateX(-50px); /* L'élément glisse depuis la droite */
+}
+
+.fade-leave-from,
+.fade-enter-to {
+  opacity: 1;
+  // transform: translateX(0); /* Position d'origine */
+}

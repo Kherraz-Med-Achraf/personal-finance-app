@@ -7,22 +7,16 @@
       </transition>
     </div>
     <ul :class="{ close: !sidebarMenuOpen }">
-      <li>
-        <router-link to="/" exact-active-class="active"
-          ><OverviewIcon />
-          <transition name="fade" mode="out-in">
-            <span v-if="sidebarMenuOpen">Overview</span>
-          </transition>
-        </router-link>
-      </li>
-      <li>
-        <router-link to="/transactions" active-class="active"
-          ><TransactionsIcon />
-          <transition name="fade" mode="out-in">
-            <span v-if="sidebarMenuOpen">Transactions</span>
-          </transition>
-        </router-link>
-      </li>
+      <SidebarMenuItem
+        to="/"
+        title="Overview"
+        :sidebarMenuOpen="sidebarMenuOpen"
+      />
+      <SidebarMenuItem
+        to="/transactions"
+        title="Transactions"
+        :sidebarMenuOpen="sidebarMenuOpen"
+      />
     </ul>
     <button @click="toggleSidebarMenu">
       <MinimiseIcon id="Minimize-btn" class="svg-icon" />
@@ -36,10 +30,9 @@
 <script setup>
 import { animate } from "@motionone/dom";
 import { ref, onMounted } from "vue";
+import SidebarMenuItem from "@/components/sidebar/SidebarMenuItem.vue";
 import LogoLarge from "@/assets/images/logo-large.svg";
 import logoSmall from "@/assets/images/logo-small.svg";
-import OverviewIcon from "@/assets/images/icon-nav-overview.svg";
-import TransactionsIcon from "@/assets/images/icon-nav-transactions.svg";
 import MinimiseIcon from "@/assets/images/icon-minimize-menu.svg";
 
 let sidebarMenuOpen = ref(true);
@@ -102,52 +95,6 @@ const toggleSidebarMenu = () => {
     width: 100%;
     padding-right: $spacing-300;
     transition: padding-right 0.3s ease;
-    li {
-      height: 58px;
-      width: 100%;
-      cursor: pointer;
-      a {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        gap: $spacing-200;
-        text-decoration: none;
-        height: 100%;
-        width: 100%;
-        padding: 0 $spacing-400;
-        svg{
-          height: 24px;
-          min-width: 24px;
-          fill: $grey-300;
-        }
-        span {
-          @include text-preset-3;
-          color: $grey-300;
-          transition: all 0.3s ease;
-        }
-        &.active {
-          background-color: $grey-100;
-          border-radius: 0 $spacing-150 $spacing-150 0;
-          box-shadow: inset 4px 0 0 0 $green;
-          svg {
-            fill: $green;
-          }
-          span {
-            color: $grey-900;
-          }
-        }
-      }
-      &:hover {
-        a:not(.active) {
-          span {
-            color: $grey-100;
-          }
-          svg {
-            fill: $grey-100;
-          }
-        }
-      }
-    }
     &.close {
       padding-right: $spacing-100;
     }
@@ -184,23 +131,5 @@ const toggleSidebarMenu = () => {
       }
     }
   }
-}
-
-// Animations pour les <span>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-  // transform: translateX(-50px); /* L'élément glisse depuis la droite */
-}
-
-.fade-leave-from,
-.fade-enter-to {
-  opacity: 1;
-  // transform: translateX(0); /* Position d'origine */
 }
 </style>
