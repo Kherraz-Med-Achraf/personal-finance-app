@@ -3,10 +3,6 @@
     <SidebarMenu @toggle-sidebar="handleSidebarToggle" />
     <div class="spacing"></div>
     <div class="main-content">
-      <div class="top">
-        <h1>Transactions</h1>
-        <button>test</button>
-      </div>
       <router-view />
     </div>
   </div>
@@ -41,16 +37,6 @@ const handleSidebarToggle = (sidebarMenuOpen) => {
     align-items: flex-start;
     min-height: 100vh;
     padding: $spacing-400 $spacing-500;
-    .top {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      h1 {
-        @include text-preset-1;
-        color: $grey-900;
-      }
-    }
   }
 }
 </style>

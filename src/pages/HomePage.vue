@@ -1,10 +1,17 @@
 <template>
-  <div class="home">
-    <h1>Hello Main !</h1>
-  </div>
+  <TopSection
+    :title="'Transactions'"
+    :buttonText="'test'"
+    :onButtonClick="handleButtonClick"
+  />
 </template>
 
-<script setup></script>
+<script setup>
+import TopSection from "@/layouts/TopSection.vue";
+const handleButtonClick = () => {
+  console.log('Button clicked');
+};
+</script>
 
 <style lang="scss" scoped>
 .home {
@@ -12,7 +19,6 @@
   justify-content: center;
   align-items: center;
   height: 100%;
-  
 
   h1 {
     color: #333;
