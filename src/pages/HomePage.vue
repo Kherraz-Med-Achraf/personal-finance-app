@@ -1,7 +1,7 @@
 <template>
   <TopSection
     :title="'Transactions'"
-    :buttonText="'test'"
+    :buttonText="'+ Add New Budget'"
     :onButtonClick="handleButtonClick"
   />
 </template>

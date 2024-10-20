@@ -39,4 +39,11 @@ const handleSidebarToggle = (sidebarMenuOpen) => {
     padding: $spacing-400 $spacing-500;
   }
 }
+@media (max-width: 768px) {
+  .dashboard-layout {
+    .spacing {
+      display: none;
+    }
+  }
+}
 </style>

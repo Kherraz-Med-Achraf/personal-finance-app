@@ -71,13 +71,14 @@ const sideBarAnimation = () => {
 
 const toggleSidebarMenu = () => {
   sidebarMenuOpen.value = !sidebarMenuOpen.value;
-  emit("sidebarMenuOpen", sidebarMenuOpen.value);
+  emit("toggle-sidebar", sidebarMenuOpen.value);
   sideBarAnimation();
 };
 
 const handleResize = () => {
   if (window.innerWidth <= 768 && !sidebarMenuOpen.value) {
     sidebarMenuOpen.value = true;
+    emit("toggle-sidebar", sidebarMenuOpen.value);
     sideBarAnimation();
   } 
 };
