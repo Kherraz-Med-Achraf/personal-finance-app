@@ -1,42 +1,61 @@
 <template>
-    <div ref="tabulatorTable"></div>
-  </template>
-  
-  <script setup>
-  import { onMounted, ref } from "vue";
-  import { TabulatorFull as Tabulator } from "tabulator-tables"; // Import nommé de Tabulator
-  import "tabulator-tables/dist/css/tabulator.min.css"; // Importation des styles Tabulator
-  
-  // Props pour recevoir les données et les colonnes
-  const props = defineProps({
-    data: {
-      type: Array,
-      required: true,
-    },
-    columns: {
-      type: Array,
-      required: true,
-    },
-    options: {
-      type: Object,
-      default: () => ({}),
-    },
+  <div :class="customClass" ref="tabulatorTable"></div>
+</template>
+
+<script setup>
+import { onMounted, ref, watch } from "vue";
+import { TabulatorFull as Tabulator } from "tabulator-tables";
+import "tabulator-tables/dist/css/tabulator.min.css";
+
+const props = defineProps({
+  data: {
+    type: Array,
+    required: true,
+  },
+  columns: {
+    type: Array,
+    required: true,
+  },
+  options: {
+    type: Object,
+    default: () => ({}),
+  },
+  customClass: {
+    type: String,
+    default: "", // Classe personnalisée
+  },
+});
+
+const tabulatorTable = ref(null);
+let tabulatorInstance = null;
+
+const initializeTable = () => {
+  if (tabulatorInstance) {
+    tabulatorInstance.destroy(); // Détruire l'instance précédente pour éviter les doublons
+  }
+  tabulatorInstance = new Tabulator(tabulatorTable.value, {
+    data: props.data,
+    columns: props.columns,
+    ...props.options,
   });
-  
-  // Ref pour le tableau Tabulator
-  const tabulatorTable = ref(null);
-  
-  // Initialisation du tableau avec Tabulator lors du montage du composant
-  onMounted(() => {
-    new Tabulator(tabulatorTable.value, {
-      data: props.data, // Les données à afficher
-      columns: props.columns, // Les colonnes du tableau
-      ...props.options, // Options supplémentaires passées par les props
-    });
-  });
-  </script>
-  
-  <style scoped>
-  /* Ajoute des styles personnalisés si nécessaire */
-  </style>
-  
+};
+
+onMounted(() => {
+  initializeTable();
+});
+
+// Réinitialiser Tabulator à chaque changement de données ou colonnes
+watch(
+  () => [props.data, props.columns],
+  () => {
+    initializeTable();
+  },
+  { deep: true }
+);
+</script>
+<style lang="scss" scoped>
+.transactions-table {
+  width: 100%;
+  height: 100%;
+}
+</style>
