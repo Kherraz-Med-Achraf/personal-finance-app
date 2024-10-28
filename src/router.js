@@ -1,7 +1,8 @@
 // router/index.js
 import { createRouter, createWebHistory } from "vue-router";
 import DashboardLayout from "./layouts/DashboardLayout.vue";
-import Home from "./pages/HomePage.vue";
+import Overview from "./pages/OverviewPage.vue";
+import Transactions from "./pages/TransactionsPage.vue";
 
 const routes = [
   {
@@ -10,14 +11,14 @@ const routes = [
     children: [
       {
         path: "",
-        name: "Home",
-        component: Home,
+        name: "Overview",
+        component: Overview,
       },
-      // {
-      //   path: "profile",
-      //   name: "Profile",
-      //   component: Profile,
-      // },
+      {
+        path: "transactions",
+        name: "Transactions",
+        component: Transactions,
+      },
       // {
       //   path: "settings",
       //   name: "Settings",
