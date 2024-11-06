@@ -4,14 +4,12 @@
     :buttonText="'Add New Budget'"
     :onButtonClick="handleButtonClick"
   />
-  <div class="table-container">
-    <TabulatorTable
-      :data="tableData"
-      :columns="tableColumns"
-      :options="tableOptions"
-      customClass="transactions-table"
-    />
-  </div>
+  <TabulatorTable
+    :data="tableData"
+    :columns="tableColumns"
+    :options="tableOptions"
+    customClass="transactions-table"
+  />
 </template>
 
 <script setup>
@@ -19,6 +17,8 @@ import { reactive, onMounted, watch, computed } from "vue";
 import TopSection from "@/layouts/TopSection.vue";
 import TabulatorTable from "@/utils/TabulatorTable.vue";
 import data from "@/data.json"; // Importer les données JSON directement
+import { useMenuStore } from "@/stores/menuStore";
+import { animate } from "@motionone/dom";
 
 const tableData = reactive([]);
 
@@ -59,10 +59,10 @@ const tableColumns = reactive([
     title: "Recipient / Sender",
     field: "recipientSender",
     cssClass: "recipient-column",
-    widthGrow: 2,
+    widthGrow: 10, // Permet à cette colonne de s'étirer davantage
     formatter: (cell) => {
       const { avatar, name } = cell.getValue();
-      return `<div style="display: flex; align-items: center;">
+      return `<div style="display: flex; align-items: center; width: 100%;">
                 <img src="${avatar}" alt="${name}" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 8px;">
                 <span>${name}</span>
               </div>`;
@@ -74,14 +74,16 @@ const tableColumns = reactive([
     field: "category",
     sorter: "string",
     cssClass: "category-column",
-    resizable: true,
+    width: 150,
+    resizable: false,
   },
   {
     title: "Transaction Date",
     field: "transactionDate",
     sorter: "string",
     cssClass: "date-column",
-    resizable: true,
+    width: 150, 
+    resizable: false, 
   },
   {
     title: "Amount",
@@ -89,25 +91,27 @@ const tableColumns = reactive([
     sorter: "number",
     hozAlign: "right",
     cssClass: "amount-column",
-    resizable: true,
+    width: 150, 
+    resizable: false,
   },
   {
     title: "Recurring",
     field: "recurring",
     sorter: "boolean",
     cssClass: "recurring-column last-column",
-    resizable: true,
+   
+    resizable: false, 
   },
 ]);
 
-// Options supplémentaires pour Tabulator
 const tableOptions = reactive({
   pagination: "local",
-  responsiveLayout: "hide",
-  resizableColumnFit: true,
-  layout: "fitColumns",
+  resizableColumnFit: false,
+  layout: "fitColumns", 
   movableColumns: true,
+  autoResize: false, // Garder autoResize à false pour gérer manuellement le redimensionnement
 });
+
 
 // Définir une réactivité pour ajuster `paginationSize` en fonction de `tableData` et des pages souhaitées
 const pagesDesired = 5; // Nombre de pages souhaité
@@ -130,6 +134,4 @@ const handleButtonClick = () => {
 </script>
 
 <style lang="scss" scoped>
-
-
 </style>

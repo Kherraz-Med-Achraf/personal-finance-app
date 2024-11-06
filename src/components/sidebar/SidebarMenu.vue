@@ -2,46 +2,46 @@
   <div class="sidebar-menu">
     <div class="logo">
       <transition name="fade" mode="out-in">
-        <logo-large v-if="sidebarMenuOpen" />
+        <logo-large v-if="menuStore.sidebarMenuOpen" />
         <logoSmall v-else class="mini" />
       </transition>
     </div>
-    <ul :class="{ close: !sidebarMenuOpen }">
+    <ul :class="{ close: !menuStore.sidebarMenuOpen }">
       <SidebarMenuItem
         to="/"
         title="Overview"
-        :sidebarMenuOpen="sidebarMenuOpen"
+        :sidebarMenuOpen="menuStore.sidebarMenuOpen"
         :responsiveMode="responsiveMode"
       />
       <SidebarMenuItem
         to="/transactions"
         title="Transactions"
-        :sidebarMenuOpen="sidebarMenuOpen"
+        :sidebarMenuOpen="menuStore.sidebarMenuOpen"
         :responsiveMode="responsiveMode"
       />
       <SidebarMenuItem
         to="/budgets"
         title="Budgets"
-        :sidebarMenuOpen="sidebarMenuOpen"
+        :sidebarMenuOpen="menuStore.sidebarMenuOpen"
         :responsiveMode="responsiveMode"
       />
       <SidebarMenuItem
         to="/pots"
         title="Pots"
-        :sidebarMenuOpen="sidebarMenuOpen"
+        :sidebarMenuOpen="menuStore.sidebarMenuOpen"
         :responsiveMode="responsiveMode"
       />
       <SidebarMenuItem
         to="/recurring-bills"
         title="Recurring Bills"
-        :sidebarMenuOpen="sidebarMenuOpen"
+        :sidebarMenuOpen="menuStore.sidebarMenuOpen"
         :responsiveMode="responsiveMode"
       />
     </ul>
-    <button @click="toggleSidebarMenu">
+    <button @click="menuStore.toggleSidebarMenu">
       <MinimiseIcon id="Minimize-btn" class="svg-icon" />
       <transition name="fade" mode="out-in">
-        <span v-if="sidebarMenuOpen">Minimize Menu</span>
+        <span v-if="menuStore.sidebarMenuOpen">Minimize Menu</span>
       </transition>
     </button>
   </div>
@@ -49,18 +49,21 @@
 
 <script setup>
 import { animate } from "@motionone/dom";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
+import { useMenuStore } from "@/stores/menuStore";
 import SidebarMenuItem from "@/components/sidebar/SidebarMenuItem.vue";
 import LogoLarge from "@/assets/images/logo-large.svg";
 import logoSmall from "@/assets/images/logo-small.svg";
 import MinimiseIcon from "@/assets/images/icon-minimize-menu.svg";
 
-let sidebarMenuOpen = ref(true);
+const menuStore = useMenuStore();
+
+
 let responsiveMode = ref(false);
 const emit = defineEmits(["toggle-sidebar"]);
 
 const sideBarAnimation = () => {
-  if (sidebarMenuOpen.value) {
+  if (menuStore.sidebarMenuOpen) {
     animate(".sidebar-menu", { width: "300px" }, { duration: 0.5 });
     animate("#Minimize-btn", { rotate: ["180deg", "0deg"] }, { duration: 0.5 });
   } else {
@@ -69,18 +72,21 @@ const sideBarAnimation = () => {
   }
 };
 
-const toggleSidebarMenu = () => {
-  sidebarMenuOpen.value = !sidebarMenuOpen.value;
-  emit("toggle-sidebar", sidebarMenuOpen.value);
-  sideBarAnimation();
-};
+watch(
+  () => menuStore.sidebarMenuOpen,
+  (newValue) => {
+    sideBarAnimation(); 
+    emit("toggle-sidebar", newValue);
+  }
+);
+
 
 const handleResize = () => {
-  if (window.innerWidth <= 768 && !sidebarMenuOpen.value) {
-    sidebarMenuOpen.value = true;
-    emit("toggle-sidebar", sidebarMenuOpen.value);
+  if (window.innerWidth <= 768 && !menuStore.sidebarMenuOpen) {
+    menuStore.sidebarMenuOpen = true;
+    emit("toggle-sidebar", menuStore.sidebarMenuOpen);
     sideBarAnimation();
-  } 
+  }
 };
 
 onMounted(() => {

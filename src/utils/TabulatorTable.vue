@@ -56,6 +56,6 @@ watch(
 <style lang="scss" scoped>
 .transactions-table {
   width: 100%;
-  height: 100%;
+  
 }
 </style>

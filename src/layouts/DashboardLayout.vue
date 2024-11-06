@@ -1,7 +1,6 @@
 <template>
   <div class="dashboard-layout">
     <SidebarMenu @toggle-sidebar="handleSidebarToggle" />
-    <div class="spacing"></div>
     <div class="main-content">
       <router-view />
     </div>
@@ -14,9 +13,13 @@ import { animate } from "@motionone/dom";
 
 const handleSidebarToggle = (sidebarMenuOpen) => {
   if (sidebarMenuOpen) {
-    animate(".spacing", { width: "300px" }, { duration: 0.5 });
+    animate(
+      ".main-content",
+      { width: "calc(100% - 300px)" },
+      { duration: 0.5 }
+    );
   } else {
-    animate(".spacing", { width: "88px" }, { duration: 0.5 });
+    animate(".main-content", { width: "calc(100% - 88px)" }, { duration: 0.5 });
   }
 };
 </script>
@@ -24,19 +27,19 @@ const handleSidebarToggle = (sidebarMenuOpen) => {
 <style lang="scss" scoped>
 .dashboard-layout {
   display: flex;
+  justify-content: flex-end;
   height: 100%;
   width: 100%;
-  .spacing {
-    width: 300px;
-  }
   .main-content {
-    flex: 1;
+    width: calc(100% - 300px);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
+    gap: $spacing-400;
     min-height: 100vh;
     padding: $spacing-400 $spacing-500;
+    transition: width 0.3s ease;
   }
 }
 @media (max-width: 768px) {
