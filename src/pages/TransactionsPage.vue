@@ -17,15 +17,14 @@ import { reactive, onMounted, watch, computed } from "vue";
 import TopSection from "@/layouts/TopSection.vue";
 import TabulatorTable from "@/utils/TabulatorTable.vue";
 import data from "@/data.json"; // Importer les données JSON directement
-import { useMenuStore } from "@/stores/menuStore";
-import { animate } from "@motionone/dom";
+import { Grid, html } from "gridjs";
 
-const tableData = reactive([]);
 
 // Charger toutes les URLs des images du dossier "avatars" avec Vite
 const images = import.meta.glob("@/assets/images/avatars/*", {
   eager: true, // Charge immédiatement les fichiers
-  as: "url", // Retourne chaque fichier sous forme d'URL
+  query: "?url", // Utilise la nouvelle syntaxe pour récupérer les URLs
+  import: "default", // Importer les fichiers en tant qu'URLs par défaut
 });
 
 function getImageUrl(filepath) {
@@ -34,104 +33,33 @@ function getImageUrl(filepath) {
   return images[`/src/assets/images/avatars/${filename}`] || "";
 }
 
-// Préparer les données lors du montage du composant
-onMounted(() => {
-  tableData.push(
-    ...data.transactions.map((transaction) => ({
-      recipientSender: {
-        avatar: getImageUrl(transaction.avatar),
-        name: transaction.name,
-      },
-      category: transaction.category,
-      transactionDate: new Date(transaction.date).toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }),
-      amount: transaction.amount.toFixed(2),
-      recurring: transaction.recurring,
-    }))
-  );
-});
-
-const tableColumns = reactive([
+const tableColumns = [
   {
-    title: "Recipient / Sender",
-    field: "recipientSender",
-    cssClass: "recipient-column",
-    widthGrow: 10, // Permet à cette colonne de s'étirer davantage
-    formatter: (cell) => {
-      const { avatar, name } = cell.getValue();
-      return `<div style="display: flex; align-items: center; width: 100%;">
-                <img src="${avatar}" alt="${name}" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 8px;">
-                <span>${name}</span>
-              </div>`;
-    },
-    resizable: true,
+    name: "Recipient / Sender",
+    formatter: (_, row) =>
+      html(`
+        <div style="display: flex; align-items: center;">
+          <img src="${getImageUrl(row.cells[0].data)}" alt="${
+        row.cells[1].data
+      }" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px;">
+          ${row.cells[1].data}
+        </div>
+      `),
   },
-  {
-    title: "Category",
-    field: "category",
-    sorter: "string",
-    cssClass: "category-column",
-    width: 150,
-    resizable: false,
-  },
-  {
-    title: "Transaction Date",
-    field: "transactionDate",
-    sorter: "string",
-    cssClass: "date-column",
-    width: 150, 
-    resizable: false, 
-  },
-  {
-    title: "Amount",
-    field: "amount",
-    sorter: "number",
-    hozAlign: "right",
-    cssClass: "amount-column",
-    width: 150, 
-    resizable: false,
-  },
-  {
-    title: "Recurring",
-    field: "recurring",
-    sorter: "boolean",
-    cssClass: "recurring-column last-column",
-   
-    resizable: false, 
-  },
-]);
+  "Category",
+  "Transaction Date",
+  "Amount",
+];
 
-const tableOptions = reactive({
-  pagination: "local",
-  resizableColumnFit: false,
-  layout: "fitColumns", 
-  movableColumns: true,
-  autoResize: false, // Garder autoResize à false pour gérer manuellement le redimensionnement
-});
-
-
-// Définir une réactivité pour ajuster `paginationSize` en fonction de `tableData` et des pages souhaitées
-const pagesDesired = 5; // Nombre de pages souhaité
-
-const paginationSize = computed(() => {
-  return Math.ceil(tableData.length / pagesDesired);
-});
-
-// Observer les changements pour mettre à jour `paginationSize`
-watch(
-  () => paginationSize.value,
-  (newSize) => {
-    tableOptions.paginationSize = newSize;
-  }
+const tableData = reactive(
+  data.transactions.map((transaction) => [
+    transaction.avatar, // URL de l'avatar
+    transaction.name, // Nom
+    transaction.category, // Catégorie
+    transaction.date.split("T")[0], // Date (partie uniquement)
+    transaction.amount, // Montant
+  ])
 );
-
-const handleButtonClick = () => {
-  console.log("Button clicked");
-};
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

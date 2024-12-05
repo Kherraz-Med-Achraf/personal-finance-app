@@ -1,11 +1,11 @@
 <template>
-  <div :class="customClass" ref="tabulatorTable"></div>
+  <div id="gridjs-container" :class="customClass"></div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from "vue";
-import { TabulatorFull as Tabulator } from "tabulator-tables";
-import "tabulator-tables/dist/css/tabulator.min.css";
+import { onMounted } from "vue";
+import { Grid } from "gridjs";
+import "gridjs/dist/theme/mermaid.css"; // Importer le thème Mermaid par défaut
 
 const props = defineProps({
   data: {
@@ -26,36 +26,35 @@ const props = defineProps({
   },
 });
 
-const tabulatorTable = ref(null);
-let tabulatorInstance = null;
-
-const initializeTable = () => {
-  if (tabulatorInstance) {
-    tabulatorInstance.destroy(); // Détruire l'instance précédente pour éviter les doublons
-  }
-  tabulatorInstance = new Tabulator(tabulatorTable.value, {
-    data: props.data,
-    columns: props.columns,
-    ...props.options,
-  });
+// Valeurs par défaut
+const defaultOptions = {
+  pagination: {
+    enabled: true,
+    limit: 5,
+  },
+  sort: true,
+  resizable: true,
+  style: {
+    table: {
+      border: "1px solid #ccc",
+    },
+  },
 };
 
 onMounted(() => {
-  initializeTable();
-});
+  // Fusion des options par défaut avec celles du parent
+  const gridOptions = {
+    ...defaultOptions,
+    ...props.options, // Les options du parent écrasent celles par défaut
+    columns: props.columns,
+    data: props.data,
+  };
 
-// Réinitialiser Tabulator à chaque changement de données ou colonnes
-watch(
-  () => [props.data, props.columns],
-  () => {
-    initializeTable();
-  },
-  { deep: true }
-);
+  new Grid(gridOptions).render(document.getElementById("gridjs-container"));
+});
 </script>
 <style lang="scss" scoped>
-.transactions-table {
-  width: 100%;
-  
+#gridjs-container {
+  margin-top: 20px;
 }
 </style>

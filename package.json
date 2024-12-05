@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@motionone/dom": "^10.18.0",
+    "gridjs": "^6.2.0",
     "pinia": "^2.2.6",
     "sass": "^1.79.4",
-    "tabulator-tables": "^6.3.0",
     "vue": "^3.4.37",
     "vue-router": "^4.4.5"
   },
