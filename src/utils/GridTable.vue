@@ -5,7 +5,7 @@
 <script setup>
 import { onMounted } from "vue";
 import { Grid } from "gridjs";
-import "gridjs/dist/theme/mermaid.css"; // Importer le thème Mermaid par défaut
+import "gridjs/dist/theme/mermaid.css";
 
 const props = defineProps({
   data: {
@@ -22,7 +22,7 @@ const props = defineProps({
   },
   customClass: {
     type: String,
-    default: "", // Classe personnalisée
+    default: "",
   },
 });
 
@@ -54,7 +54,4 @@ onMounted(() => {
 });
 </script>
 <style lang="scss" scoped>
-#gridjs-container {
-  margin-top: 20px;
-}
 </style>

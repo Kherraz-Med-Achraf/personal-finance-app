@@ -44,8 +44,12 @@ const handleSidebarToggle = (sidebarMenuOpen) => {
 }
 @media (max-width: 768px) {
   .dashboard-layout {
+    justify-content: flex-start;
     .spacing {
       display: none;
+    }
+    .main-content {
+      width: 100%;
     }
   }
 }
