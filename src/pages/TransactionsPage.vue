@@ -5,36 +5,44 @@
     :onButtonClick="handleButtonClick"
   />
 
-  <!-- Contrôles de filtrage et tri -->
-  <div class="table-controls">
-    <!-- Recherche globale -->
-    <SearchInput v-model="searchTerm" placeholder="Chercher une moto..." />
+  <div class="table-container">
+    <!-- Contrôles de filtrage et tri -->
+    <div class="table-controls">
+      <!-- Recherche globale -->
+      <SearchInput v-model="searchTerm" placeholder="Search transaction" />
+      <div class="filtres">
+        <div class="filtre">
+          <span>Sort by</span>
+          <!-- Tri personnalisé -->
+          <FilterDropdown
+            :options="sortOptions"
+            placeholder="Latest"
+            v-model="selectedSort"
+            width="114px"
+          />
+        </div>
+        <div class="filtre">
+          <span>Category</span>
+          <!-- Filtre par catégorie -->
+          <FilterDropdown
+            :options="categoryOptions"
+            placeholder="All Transactions"
+            v-model="selectedCategory"
+            width="177px"
+          />
+        </div>
+      </div>
+    </div>
 
-    <!-- Filtre par catégorie -->
-    <FilterDropdown
-      :options="categoryOptions"
-      placeholder="All Transactions"
-      v-model="selectedCategory"
-      width="250px"
-    />
-
-    <!-- Tri personnalisé -->
-    <FilterDropdown
-      :options="sortOptions"
-      placeholder="Latest"
-      v-model="selectedSort"
-      width="177px"
+    <!-- GridTable : on lui passe les données calculées et une clé dynamique pour re-render -->
+    <GridTable
+      :data="computedData"
+      :columns="tableColumns"
+      :options="tableOptions"
+      :key="gridKey"
+      customClass="transactions-table"
     />
   </div>
-
-  <!-- GridTable : on lui passe les données calculées et une clé dynamique pour re-render -->
-  <GridTable
-    :data="computedData"
-    :columns="tableColumns"
-    :options="tableOptions"
-    :key="gridKey"
-    customClass="transactions-table"
-  />
 </template>
 
 <script setup>
@@ -65,25 +73,30 @@ const tableColumns = [
     name: "Recipient / Sender",
     formatter: (cell) =>
       html(`
-        <div style="display: flex; align-items: center;">
-          <img src="${getImageUrl(cell.avatar)}" alt="${
-        cell.name
-      }" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px;">
-          ${cell.name}
+        <div class="recipient-info">
+          <img src="${getImageUrl(cell.avatar)}" alt="${cell.name}">
+          <span>${cell.name}</span>
         </div>
       `),
   },
   {
     id: "category",
     name: "Category",
+    className: "column-info",
   },
   {
     id: "date",
     name: "Transaction Date",
+    className: "column-info",
   },
   {
     id: "amount",
     name: "Amount",
+    className: "column-amount",
+    formatter: (cell) => {
+      const amountClass = cell >= 0 ? "positive" : "negative";
+      return html(`<span class="${amountClass}">${cell}</span>`);
+    },
   },
 ];
 
@@ -103,13 +116,8 @@ const tableOptions = {
     enabled: true,
     limit: 5,
   },
-  sort: true,
-  resizable: true,
-  style: {
-    table: {
-      border: "1px solid #ccc",
-    },
-  },
+  sort: false,
+  resizable: false,
 };
 
 // États réactifs pour les filtres et le tri
@@ -195,15 +203,40 @@ function handleButtonClick() {
 </script>
 
 <style lang="scss" scoped>
-.table-controls {
+.table-container {
+  width: 100%;
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 24px;
+  background-color: $white;
+  padding: 32px;
+  border-radius: 12px;
+  .table-controls {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .filtres {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      .filtre {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        span {
+          @include text-preset-4;
+          color: $grey-500;
+        }
+      }
+    }
 
-  input {
-    padding: 0.5rem;
-    font-size: 1rem;
+    input {
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
   }
 }
 </style>
