@@ -62,17 +62,12 @@ onMounted(() => {
   :deep(.gridjs-table) {
     border: none;
     border-collapse: collapse;
+    @include text-preset-5;
   }
 
   // En-têtes
   :deep(.gridjs-th) {
-    @include text-preset-5;
     color: $grey-500;
-    border: none;
-    background-color: $white;
-  }
-
-  :deep(.gridjs-td) {
     border: none;
     background-color: $white;
   }
@@ -80,6 +75,15 @@ onMounted(() => {
   // Lignes : ajout d'une bordure inférieure pour chaque ligne
   :deep(.gridjs-tr) {
     border-bottom: 1px solid $grey-100;
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  // Cellules
+  :deep(.gridjs-td) {
+    border: none;
+    color: $grey-500;
   }
 
   // Contenu spécifique du recipient (première colonne)
@@ -100,30 +104,64 @@ onMounted(() => {
     }
   }
 
-  // Styles spécifiques aux colonnes 2 et 3 (category et date)
-  :deep(.gridjs-th.column-info),
-  :deep(.gridjs-td.column-info) {
-    background-color: #fff;
-    padding: 12px;
-    text-align: left;
-  }
-
   // Styles pour la colonne 4 (amount)
-  :deep(.gridjs-th.column-amount),
-  :deep(.gridjs-td.column-amount) {
-    background-color: #fff;
-    padding: 12px;
-    text-align: right;
+  :deep(.gridjs-th),
+  :deep(.gridjs-td) {
+    &:nth-child(4) {
+      text-align: right;
+    }
+  }
+  :deep(.gridjs-td) {
+    &:nth-child(4) {
+      @include text-preset-4-bold;
+    }
   }
 
   // Styles pour les montants positifs et négatifs
   :deep(.positive) {
-    color: green;
+    color: $green;
     font-weight: bold;
   }
   :deep(.negative) {
-    color: red;
+    color: $grey-900;
     font-weight: bold;
+  }
+
+  // Footer
+  :deep(.gridjs-footer) {
+    border-top: none;
+    box-shadow: none;
+  }
+
+  :deep(.gridjs-pages) {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    button {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      padding: 0;
+      border-right: unset;
+      border: 1px solid $beige-500;
+      &.gridjs-currentPage {
+        background-color: $grey-900;
+        color: $white;
+      }
+      &:focus {
+        outline: none;
+        box-shadow: none;
+        margin: 0;
+      }
+      &:first-child {
+        margin-right: auto;
+      }
+      &:last-child {
+        margin-left: auto;
+      }
+    }
   }
 }
 </style>

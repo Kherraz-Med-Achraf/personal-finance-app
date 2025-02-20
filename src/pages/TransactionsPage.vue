@@ -82,20 +82,20 @@ const tableColumns = [
   {
     id: "category",
     name: "Category",
-    className: "column-info",
   },
   {
     id: "date",
     name: "Transaction Date",
-    className: "column-info",
   },
   {
     id: "amount",
     name: "Amount",
-    className: "column-amount",
     formatter: (cell) => {
       const amountClass = cell >= 0 ? "positive" : "negative";
-      return html(`<span class="${amountClass}">${cell}</span>`);
+      const sign = cell >= 0 ? "+" : "-";
+      return html(
+        `<span class="${amountClass}">${sign}$${Math.abs(cell)}</span>`
+      );
     },
   },
 ];
@@ -115,6 +115,8 @@ const tableOptions = {
   pagination: {
     enabled: true,
     limit: 5,
+    summary: false,
+    buttonsCount: 3,
   },
   sort: false,
   resizable: false,
