@@ -6,6 +6,8 @@
 import { onMounted } from "vue";
 import { Grid } from "gridjs";
 import "gridjs/dist/theme/mermaid.css";
+import CaretRightIcon from "@/assets/images/icon-caret-right.svg?url";
+import CaretLeftIcon from "@/assets/images/icon-caret-left.svg?url";
 
 const props = defineProps({
   data: {
@@ -47,7 +49,36 @@ onMounted(() => {
     data: props.data,
   };
 
-  new Grid(gridOptions).render(document.getElementById(gridId));
+  const grid = new Grid(gridOptions).render(document.getElementById(gridId));
+
+  const observer = new MutationObserver((mutations) => {
+    const container = document.getElementById(gridId);
+    if (!container) return;
+
+    const prevButtons = container.querySelectorAll('button[title="Previous"]');
+    const nextButtons = container.querySelectorAll('button[title="Next"]');
+
+    // Déconnecter temporairement l'observer
+    observer.disconnect();
+
+    prevButtons.forEach((btn) => {
+      btn.innerHTML = `<img src="${CaretLeftIcon}" alt="Previous" /> Prev`;
+    });
+
+    nextButtons.forEach((btn) => {
+      btn.innerHTML = `Next <img src="${CaretRightIcon}" alt="Next" />`;
+    });
+
+    // Reconnecter l'observer
+    observer.observe(document.getElementById(gridId), {
+      childList: true,
+      subtree: true,
+    });
+  });
+  observer.observe(document.getElementById(gridId), {
+    childList: true,
+    subtree: true,
+  });
 });
 </script>
 
@@ -146,6 +177,7 @@ onMounted(() => {
       padding: 0;
       border-right: unset;
       border: 1px solid $beige-500;
+      @include text-preset-4;
       &.gridjs-currentPage {
         background-color: $grey-900;
         color: $white;
@@ -160,6 +192,18 @@ onMounted(() => {
       }
       &:last-child {
         margin-left: auto;
+      }
+      &[title="Previous"],
+      &[title="Next"] {
+        width: 96px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        img {
+          width: 11px;
+          height: 11px;
+        }
       }
     }
   }
