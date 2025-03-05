@@ -27,29 +27,28 @@ const handleSidebarToggle = (sidebarMenuOpen) => {
 <style lang="scss" scoped>
 .dashboard-layout {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   height: 100%;
   width: 100%;
   .main-content {
-    width: calc(100% - 300px);
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
     gap: $spacing-400;
     min-height: 100vh;
-    padding: $spacing-400 $spacing-500;
+    padding: $spacing-300 $spacing-200;
     transition: width 0.3s ease;
   }
 }
-@media (max-width: 768px) {
+@media (min-width: 768px) {
   .dashboard-layout {
-    justify-content: flex-start;
-    .spacing {
-      display: none;
-    }
+    justify-content: flex-end;
     .main-content {
+      padding: $spacing-400 $spacing-500;
       width: 100%;
+      width: calc(100% - 300px);
     }
   }
 }

@@ -1,89 +1,128 @@
 <template>
-  <div :id="gridId" :class="customClass"></div>
+  <div :id="gridId" :class="customClass" :key="gridKey"></div>
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { ref, onMounted, onBeforeUnmount, nextTick } from "vue";
 import { Grid } from "gridjs";
 import "gridjs/dist/theme/mermaid.css";
 import CaretRightIcon from "@/assets/images/icon-caret-right.svg?url";
 import CaretLeftIcon from "@/assets/images/icon-caret-left.svg?url";
 
 const props = defineProps({
-  data: {
-    type: Array,
-    required: true,
-  },
-  columns: {
-    type: Array,
-    required: true,
-  },
-  options: {
-    type: Object,
-    default: () => ({}),
-  },
-  customClass: {
-    type: String,
-    default: "",
-  },
+  data: { type: Array, required: true },
+  columns: { type: Array, required: true },
+  options: { type: Object, default: () => ({}) },
+  customClass: { type: String, default: "" },
 });
 
-// Génération d'un id unique pour chaque instance
+// Génère un id unique pour le conteneur
 const gridId = "gridjs-container-" + Math.random().toString(36).slice(2, 11);
 
+// Options par défaut pour Grid.js
 const defaultOptions = {
-  pagination: {
-    enabled: true,
-    limit: 5,
-  },
+  pagination: { enabled: true, limit: 5 },
   sort: true,
   resizable: true,
 };
 
-onMounted(() => {
-  // Fusion des options par défaut et des options passées en prop
-  const gridOptions = {
-    ...defaultOptions,
-    ...props.options, // les options du parent écrasent celles par défaut
-    columns: props.columns,
-    data: props.data,
-  };
+// Ref pour détecter l'état mobile et pour forcer le remount du conteneur
+const isMobile = ref(window.innerWidth < 768);
+const gridKey = ref(0);
 
-  const grid = new Grid(gridOptions).render(document.getElementById(gridId));
+let gridInstance = null;
+let mutationObserver = null;
 
-  const observer = new MutationObserver((mutations) => {
-    const container = document.getElementById(gridId);
-    if (!container) return;
+// Retourne les colonnes en fonction de la taille de l'écran
+const getGridColumns = () => {
+  return isMobile.value
+    ? [props.columns[0], props.columns[props.columns.length - 1]]
+    : props.columns;
+};
 
+// Configure l'observateur pour customiser les boutons de pagination
+const setupMutationObserver = () => {
+  const container = document.getElementById(gridId);
+  if (!container) return;
+  if (mutationObserver) {
+    mutationObserver.disconnect();
+  }
+  mutationObserver = new MutationObserver(() => {
     const prevButtons = container.querySelectorAll('button[title="Previous"]');
     const nextButtons = container.querySelectorAll('button[title="Next"]');
 
-    // Déconnecter temporairement l'observer
-    observer.disconnect();
+    mutationObserver.disconnect();
 
     prevButtons.forEach((btn) => {
       btn.innerHTML = `<img src="${CaretLeftIcon}" alt="Previous" /> Prev`;
     });
-
     nextButtons.forEach((btn) => {
       btn.innerHTML = `Next <img src="${CaretRightIcon}" alt="Next" />`;
     });
 
-    // Reconnecter l'observer
-    observer.observe(document.getElementById(gridId), {
+    mutationObserver.observe(container, {
       childList: true,
       subtree: true,
     });
   });
-  observer.observe(document.getElementById(gridId), {
+  mutationObserver.observe(container, {
     childList: true,
     subtree: true,
   });
+};
+
+// Fonction d'initialisation/recréation de la grille
+const initGrid = () => {
+  const container = document.getElementById(gridId);
+  if (!container) return;
+
+  // Détruire l'instance précédente si possible
+  if (gridInstance && typeof gridInstance.destroy === "function") {
+    gridInstance.destroy();
+  }
+
+  // Nettoyage complet du conteneur
+  container.innerHTML = "";
+
+  const gridOptions = {
+    ...defaultOptions,
+    ...props.options,
+    columns: getGridColumns(),
+    data: props.data,
+  };
+
+  gridInstance = new Grid(gridOptions).render(container);
+  setupMutationObserver();
+};
+
+// Gestion du redimensionnement avec nextTick pour attendre la mise à jour du DOM
+const handleResize = async () => {
+  const currentIsMobile = window.innerWidth < 768;
+  if (currentIsMobile !== isMobile.value) {
+    isMobile.value = currentIsMobile;
+    gridKey.value++; // Forcer Vue à remonter le conteneur
+    await nextTick(); // Attendre que le DOM soit mis à jour
+    initGrid();
+  }
+};
+
+onMounted(() => {
+  initGrid();
+  window.addEventListener("resize", handleResize);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", handleResize);
+  if (mutationObserver) mutationObserver.disconnect();
+  if (gridInstance && typeof gridInstance.destroy === "function") {
+    gridInstance.destroy();
+  }
 });
 </script>
 
 <style lang="scss" scoped>
 .transactions-table {
+  width: 100%;
   // Container
   :deep(.gridjs-container) {
     padding: 0;
@@ -105,7 +144,9 @@ onMounted(() => {
 
   // Lignes : ajout d'une bordure inférieure pour chaque ligne
   :deep(.gridjs-tr) {
-    border-bottom: 1px solid $grey-100;
+    // border-bottom: 1px solid $grey-100;
+    border-bottom: 1px solid black;
+    height: 72px;
     &:last-child {
       border-bottom: none;
     }
@@ -138,12 +179,13 @@ onMounted(() => {
   // Styles pour la colonne 4 (amount)
   :deep(.gridjs-th),
   :deep(.gridjs-td) {
-    &:nth-child(4) {
+    padding: 0;
+    &:last-child {
       text-align: right;
     }
   }
   :deep(.gridjs-td) {
-    &:nth-child(4) {
+    &:last-child {
       @include text-preset-4-bold;
     }
   }
@@ -204,6 +246,16 @@ onMounted(() => {
           width: 11px;
           height: 11px;
         }
+      }
+    }
+  }
+}
+@media (min-width: 768px) {
+  .transactions-table {
+    :deep(.gridjs-th),
+    :deep(.gridjs-td) {
+      &:last-child {
+        text-align: right;
       }
     }
   }

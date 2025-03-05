@@ -2,51 +2,67 @@
   <TopSection
     :title="'Transactions'"
     :buttonText="'Add New Budget'"
-    :onButtonClick="handleButtonClick"
+    :onButtonClick="
+      () => {
+        console.log('Add new budget');
+      }
+    "
   />
 
   <div class="table-container">
-    <!-- Contrôles de filtrage et tri -->
+    <!-- Contrôles de filtrage et de tri -->
     <div class="table-controls">
-      <!-- Recherche globale -->
       <SearchInput v-model="searchTerm" placeholder="Search transaction" />
       <div class="filtres">
         <div class="filtre">
           <span>Sort by</span>
-          <!-- Tri personnalisé -->
           <FilterDropdown
             :options="sortOptions"
             placeholder="Latest"
             v-model="selectedSort"
             width="114px"
+            icone="sort"
           />
         </div>
         <div class="filtre">
           <span>Category</span>
-          <!-- Filtre par catégorie -->
           <FilterDropdown
             :options="categoryOptions"
             placeholder="All Transactions"
             v-model="selectedCategory"
             width="177px"
+            icone="category"
           />
         </div>
       </div>
     </div>
 
-    <!-- GridTable : on lui passe les données calculées et une clé dynamique pour re-render -->
-    <GridTable
-      :data="computedData"
-      :columns="tableColumns"
-      :options="tableOptions"
-      :key="gridKey"
-      customClass="transactions-table"
-    />
+    <!-- VERSION DESKTOP -->
+    <div v-if="!isMobile" class="table-desktop">
+      <GridTable
+        :data="desktopData"
+        :columns="tableColumns"
+        :options="tableOptions"
+        :key="gridKey"
+        customClass="transactions-table"
+      />
+    </div>
+
+    <!-- VERSION MOBILE -->
+    <div v-else class="table-mobile">
+      <GridTable
+        :data="mobileData"
+        :columns="mobileColumns"
+        :options="mobileTableOptions"
+        :key="gridKey + '-mobile'"
+        customClass="transactions-table-mobile"
+      />
+    </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, computed } from "vue";
+import { reactive, ref, computed, onMounted, onBeforeUnmount } from "vue";
 import TopSection from "@/layouts/TopSection.vue";
 import GridTable from "../utils/GridTable.vue";
 import SearchInput from "@/ui/SearchInput.vue";
@@ -54,7 +70,28 @@ import FilterDropdown from "@/ui/FilterDropdown.vue";
 import data from "@/data.json";
 import { html } from "gridjs";
 
-// Charger les URLs des images du dossier "avatars" avec Vite
+// Détecter mobile vs desktop
+const isMobile = ref(false);
+
+function handleResize() {
+  isMobile.value = window.innerWidth < 768;
+}
+
+onMounted(() => {
+  window.addEventListener("resize", handleResize);
+  handleResize();
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", handleResize);
+});
+
+// États pour la recherche, tri, etc.
+const searchTerm = ref("");
+const selectedCategory = ref("");
+const selectedSort = ref("latest");
+
+// Charger les images depuis le dossier avatars
 const images = import.meta.glob("@/assets/images/avatars/*", {
   eager: true,
   query: "?url",
@@ -66,7 +103,7 @@ function getImageUrl(filepath) {
   return images[`/src/assets/images/avatars/${filename}`] || "";
 }
 
-// Définition des colonnes pour Grid.js : on doit fournir un identifiant (id) pour chaque colonne
+// Colonnes de la version DESKTOP
 const tableColumns = [
   {
     id: "recipient",
@@ -74,7 +111,7 @@ const tableColumns = [
     formatter: (cell) =>
       html(`
         <div class="recipient-info">
-          <img src="${getImageUrl(cell.avatar)}" alt="${cell.name}">
+          <img src="${getImageUrl(cell.avatar)}" alt="${cell.name}" />
           <span>${cell.name}</span>
         </div>
       `),
@@ -100,17 +137,42 @@ const tableColumns = [
   },
 ];
 
-// Préparer les données sous forme d'objets pour faciliter le filtrage/tri
-const tableData = reactive(
-  data.transactions.map((transaction) => ({
-    recipient: { avatar: transaction.avatar, name: transaction.name },
-    category: transaction.category,
-    date: transaction.date.split("T")[0],
-    amount: transaction.amount,
-  }))
-);
+// Colonnes de la version MOBILE
+const mobileColumns = [
+  {
+    id: "info", // regroupera recipient.name + category
+    name: "",
+    formatter: (cell) => {
+      return html(`
+        <div class="recipient-info">
+          <img src="${getImageUrl(cell.avatar)}" alt="${cell.name}" />
+          <div>
+            <div class="name">${cell.name}</div>
+            <div class="category">${cell.category}</div>
+          </div>
+        </div>
+      `);
+    },
+  },
+  {
+    id: "details", // regroupera date + amount
+    name: "",
+    formatter: (cell) => {
+      const amountClass = cell.amount >= 0 ? "positive" : "negative";
+      const sign = cell.amount >= 0 ? "+" : "-";
+      return html(`
+        <div class="details">
+          <div class="date">${cell.date}</div>
+          <div class="amount ${amountClass}">
+            ${sign}$${Math.abs(cell.amount)}
+          </div>
+        </div>
+      `);
+    },
+  },
+];
 
-// Options de Grid.js (elles seront fusionnées dans GridTable)
+// Options de la table
 const tableOptions = {
   pagination: {
     enabled: true,
@@ -122,14 +184,14 @@ const tableOptions = {
   resizable: false,
 };
 
-// États réactifs pour les filtres et le tri
-const searchTerm = ref("");
-const selectedCategory = ref("");
-const selectedSort = ref("latest");
+// Pour la version mobile
+const mobileTableOptions = {
+  ...tableOptions,
+};
 
-// Options pour le dropdown de catégorie (générées dynamiquement)
+// Liste des catégories (pour le filtre)
 const categoryOptions = computed(() => {
-  const cats = tableData.map((item) => item.category);
+  const cats = data.transactions.map((item) => item.category);
   const uniqueCats = [...new Set(cats)];
   return [
     { value: "", label: "All Transactions" },
@@ -147,18 +209,20 @@ const sortOptions = [
   { value: "lowest", label: "Lowest" },
 ];
 
-// Calculer les données filtrées et triées
+// Données filtrées et triées (communes à desktop et mobile)
 const computedData = computed(() => {
-  // Filtrage
-  let filtered = tableData.filter((item) => {
+  let filtered = data.transactions.filter((item) => {
     const term = searchTerm.value.trim().toLowerCase();
     let matchesSearch = true;
     if (term) {
-      const name = item.recipient.name.toLowerCase();
+      const avatar =
+        typeof item.avatar === "string" ? item.avatar.toLowerCase() : "";
+      const name = item.name.toLowerCase();
       const category = item.category.toLowerCase();
       const date = item.date;
       const amount = item.amount.toString();
       matchesSearch =
+        avatar.includes(term) ||
         name.includes(term) ||
         category.includes(term) ||
         date.includes(term) ||
@@ -178,9 +242,9 @@ const computedData = computed(() => {
       case "oldest":
         return new Date(a.date) - new Date(b.date);
       case "aToZ":
-        return a.recipient.name.localeCompare(b.recipient.name);
+        return a.name.localeCompare(b.name);
       case "zToA":
-        return b.recipient.name.localeCompare(a.recipient.name);
+        return b.name.localeCompare(a.name);
       case "highest":
         return b.amount - a.amount;
       case "lowest":
@@ -193,15 +257,41 @@ const computedData = computed(() => {
   return filtered;
 });
 
-// Une clé dynamique afin de forcer le re‑render de GridTable à chaque changement
-const gridKey = computed(
-  () => `${selectedCategory.value}-${selectedSort.value}-${searchTerm.value}`
-);
+const formatDate = dateStr => new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
-// Exemple de fonction pour le bouton du TopSection
-function handleButtonClick() {
-  console.log("Ajouter un nouveau budget");
-}
+
+// Préparation des données version desktop
+const desktopData = computed(() => {
+  return computedData.value.map((transaction) => ({
+    recipient: {
+      avatar: transaction.avatar,
+      name: transaction.name,
+    },
+    category: transaction.category,
+    date: formatDate(transaction.date),
+    amount: transaction.amount,
+  }));
+});
+
+// Préparation des données version mobile
+const mobileData = computed(() => {
+  return computedData.value.map((transaction) => ({
+    info: {
+      avatar: transaction.avatar,
+      name: transaction.name,
+      category: transaction.category,
+    },
+    details: {
+      date: formatDate(transaction.date),
+      amount: transaction.amount,
+    },
+  }));
+});
+
+// Clé dynamique (pour forcer le re-render)
+const gridKey = computed(() => {
+  return `${selectedCategory.value}-${selectedSort.value}-${searchTerm.value}`;
+});
 </script>
 
 <style lang="scss" scoped>
@@ -220,6 +310,7 @@ function handleButtonClick() {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 24px;
     .filtres {
       display: flex;
       align-items: center;
@@ -229,15 +320,29 @@ function handleButtonClick() {
         align-items: center;
         gap: 8px;
         span {
+          display: none;
           @include text-preset-4;
           color: $grey-500;
         }
       }
     }
-
     input {
       padding: 0.5rem;
       font-size: 1rem;
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .table-container {
+    .table-controls {
+      .filtres {
+        .filtre {
+          span {
+            display: block;
+          }
+        }
+      }
     }
   }
 }

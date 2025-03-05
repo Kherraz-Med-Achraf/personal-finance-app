@@ -46,7 +46,7 @@ const searchTerm = ref(props.modelValue);
     color: $grey-500;
   }
   input {
-    flex: 1;
+    width: 100%;
     border: none;
     outline: none;
     @include text-preset-4;
