@@ -39,6 +39,7 @@ const handleSidebarToggle = (sidebarMenuOpen) => {
     gap: $spacing-400;
     min-height: 100vh;
     padding: $spacing-300 $spacing-200;
+    margin-bottom: 74px; // Pour le menu mobile
     transition: width 0.3s ease;
   }
 }

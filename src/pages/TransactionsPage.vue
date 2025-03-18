@@ -146,9 +146,9 @@ const mobileColumns = [
       return html(`
         <div class="recipient-info">
           <img src="${getImageUrl(cell.avatar)}" alt="${cell.name}" />
-          <div>
-            <div class="name">${cell.name}</div>
-            <div class="category">${cell.category}</div>
+          <div class="info">
+            <span class="name">${cell.name}</span>
+            <span class="category">${cell.category}</span>
           </div>
         </div>
       `);
@@ -162,10 +162,10 @@ const mobileColumns = [
       const sign = cell.amount >= 0 ? "+" : "-";
       return html(`
         <div class="details">
-          <div class="date">${cell.date}</div>
-          <div class="amount ${amountClass}">
+          <span class="amount ${amountClass}">
             ${sign}$${Math.abs(cell.amount)}
-          </div>
+          </span>
+          <span class="date">${cell.date}</span>
         </div>
       `);
     },
@@ -187,6 +187,10 @@ const tableOptions = {
 // Pour la version mobile
 const mobileTableOptions = {
   ...tableOptions,
+  pagination: {
+    ...tableOptions.pagination,
+    buttonsCount: 2,
+  },
 };
 
 // Liste des catégories (pour le filtre)
@@ -257,8 +261,12 @@ const computedData = computed(() => {
   return filtered;
 });
 
-const formatDate = dateStr => new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-
+const formatDate = (dateStr) =>
+  new Date(dateStr).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
 // Préparation des données version desktop
 const desktopData = computed(() => {
@@ -303,7 +311,7 @@ const gridKey = computed(() => {
   align-items: flex-start;
   gap: 24px;
   background-color: $white;
-  padding: 32px;
+  padding: $spacing-300 $spacing-250;
   border-radius: 12px;
   .table-controls {
     width: 100%;
@@ -330,6 +338,9 @@ const gridKey = computed(() => {
       padding: 0.5rem;
       font-size: 1rem;
     }
+  }
+  .table-mobile {
+    width: 100%;
   }
 }
 

@@ -175,6 +175,7 @@ onMounted(() => {
 }
 @media (max-width: 768px) {
   .sidebar-menu {
+    z-index: 1000;
     width: 100% !important;
     border-radius: $spacing-100 $spacing-100 0 0;
     height: 74px;

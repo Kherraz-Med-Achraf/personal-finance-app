@@ -52,12 +52,11 @@ const setupMutationObserver = () => {
     const nextButtons = container.querySelectorAll('button[title="Next"]');
 
     mutationObserver.disconnect();
-
     prevButtons.forEach((btn) => {
-      btn.innerHTML = `<img src="${CaretLeftIcon}" alt="Previous" /> Prev`;
+      isMobile ? btn.innerHTML = `<img src="${CaretLeftIcon}" alt="Previous" />` : btn.innerHTML = `<img src="${CaretLeftIcon}" alt="Previous" /> Prev` ;
     });
     nextButtons.forEach((btn) => {
-      btn.innerHTML = `Next <img src="${CaretRightIcon}" alt="Next" />`;
+      isMobile ? btn.innerHTML = `<img src="${CaretRightIcon}" alt="Next" />` : btn.innerHTML = `Next <img src="${CaretRightIcon}" alt="Next" />`;
     });
 
     mutationObserver.observe(container, {
@@ -158,6 +157,13 @@ onBeforeUnmount(() => {
     color: $grey-500;
   }
 
+  :deep(.gridjs-th),
+  :deep(.gridjs-td) {
+    &:last-child {
+      text-align: right;
+    }
+  }
+
   // Contenu spécifique du recipient (première colonne)
   :deep(.recipient-info) {
     display: flex;
@@ -249,15 +255,141 @@ onBeforeUnmount(() => {
       }
     }
   }
-}
-@media (min-width: 768px) {
-  .transactions-table {
-    :deep(.gridjs-th),
-    :deep(.gridjs-td) {
+
+  // Styles pour le tableau sur mobile
+  &-mobile {
+    width: 100%;
+    // Container
+    :deep(.gridjs-container) {
+      padding: 0;
+    }
+
+    // En-têtes
+    :deep(.gridjs-thead) {
+      display: none;
+    }
+
+    // Lignes : ajout d'une bordure inférieure pour chaque ligne
+    :deep(.gridjs-tr) {
+      border-bottom: 1px solid $grey-100;
+      min-height: 43px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      &:first-child {
+        padding: 0 0 16px 0;
+      }
       &:last-child {
-        text-align: right;
+        border-bottom: none;
       }
     }
+
+    // Cellules
+    :deep(.gridjs-td) {
+      border: none;
+      color: $grey-500;
+      padding: 0;
+    }
+
+    // Contenu spécifique du recipient (première colonne)
+    :deep(.recipient-info) {
+      display: flex;
+      align-items: center;
+      gap: $spacing-150;
+
+      img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+      }
+      .info {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-50;
+        .name {
+          @include text-preset-4-bold;
+          color: $grey-900;
+        }
+        .category {
+          @include text-preset-5;
+          color: $grey-500;
+        }
+      }
+    }
+
+    // Contenu spécifique des détails (deuxième colonne)
+    :deep(.details) {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: $spacing-50;
+      width: fit-content;
+      .amount {
+        @include text-preset-4-bold;
+        color: $grey-900;
+        &.positive {
+          color: $green;
+          font-weight: bold;
+        }
+      }
+      .date {
+        @include text-preset-5;
+        color: $grey-500;
+      }
+    }
+
+    // Footer
+    :deep(.gridjs-footer) {
+      border-top: none;
+      box-shadow: none;
+      width: 100%;
+      padding: 0;
+    }
+
+    :deep(.gridjs-pages) {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    button {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      padding: 0;
+      border-right: unset;
+      border: 1px solid $beige-500;
+      @include text-preset-4;
+      &.gridjs-currentPage {
+        background-color: $grey-900;
+        color: $white;
+      }
+      &:focus {
+        outline: none;
+        box-shadow: none;
+        margin: 0;
+      }
+      &:first-child {
+        margin-right: auto;
+      }
+      &:last-child {
+        margin-left: auto;
+      }
+      &[title="Previous"],
+      &[title="Next"] {
+        width: 48px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        img {
+          width: 11px;
+          height: 11px;
+        }
+      }
+    }
+  }
   }
 }
 </style>
